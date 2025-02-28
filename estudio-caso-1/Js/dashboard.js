@@ -24,10 +24,14 @@ document.addEventListener('DOMContentLoaded', function(){
                     <div class="comments-section">
                         <h6>Comments</h6>
                         <ul class="list-group" id="comments-${task.id}">
-                            ${task.comments.map((comment, index) => `<li class="list-group-item d-flex justify-content-between">${comment} <button class="btn btn-sm btn-danger delete-comment" data-task-id="${task.id}" data-index="${index}">X</button></li>`).join('')}
+                            ${task.comments.map((comment, index) => `
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    ${comment}
+                                    <button class="btn btn-sm btn-danger delete-comment" data-task-id="${task.id}" data-comment-index="${index}">X</button>
+                                </li>`).join('')}
                         </ul>
                         <div class="input-group mt-2">
-                            <input type="text" class="form-control comment-input" id="comment-input-${task.id}" placeholder="Add a comment">
+                            <input type="text" class="form-control" id="comment-input-${task.id}" placeholder="Add a comment">
                             <button class="btn btn-primary add-comment" data-id="${task.id}">Add</button>
                         </div>
                     </div>
@@ -80,17 +84,17 @@ document.addEventListener('DOMContentLoaded', function(){
         const taskId = parseInt(event.target.dataset.id);
         const inputField = document.getElementById(`comment-input-${taskId}`);
         const commentText = inputField.value.trim();
-        if (commentText !== "") {
+        if (commentText) {
             const task = tasks.find(t => t.id === taskId);
             task.comments.push(commentText);
-            inputField.value = "";
+            inputField.value = '';
             loadTasks();
         }
     }
 
     function handleDeleteComment(event) {
         const taskId = parseInt(event.target.dataset.taskId);
-        const commentIndex = parseInt(event.target.dataset.index);
+        const commentIndex = parseInt(event.target.dataset.commentIndex);
         const task = tasks.find(t => t.id === taskId);
         task.comments.splice(commentIndex, 1);
         loadTasks();
@@ -106,9 +110,7 @@ document.addEventListener('DOMContentLoaded', function(){
         if (taskId) {
             const taskIndex = tasks.findIndex(t => t.id == taskId);
             if (taskIndex !== -1) {
-                tasks[taskIndex].title = taskTitle;
-                tasks[taskIndex].description = taskDesc;
-                tasks[taskIndex].dueDate = dueDate;
+                tasks[taskIndex] = { id: parseInt(taskId), title: taskTitle, description: taskDesc, dueDate, comments: tasks[taskIndex].comments };
             }
         } else {
             const newTask = {
